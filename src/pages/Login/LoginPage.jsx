@@ -1,5 +1,6 @@
 import React, {useState} from "react";
 import { TextField, Button, Paper, Typography, Container } from '@mui/material';
+import './styles.css'
 
 
 function Login({onLogin}){
@@ -12,15 +13,15 @@ function Login({onLogin}){
     }
 
     return (
-        <Container component="main" maxWidth = "xs" style={{display: 'flex', flexDirection:'column', alignItems: 'center', justifyContent:'center', height:'100vh' }}>
-            <Paper elevation={6} style={{padding: '20px'}}>
+        <Container className="container_login"component="main" maxWidth = "xs">
+            <Paper className="card_login" elevation={6}>
                 <Typography variant = "h5" align="center">
                     Login
                 </Typography>
-                <form style={{marginTop: '20px'}}>
+                <form className="form_login">
                     <TextField variant="outlined" fullWidth label="Login" margin ="normal" value={username} onChange={(e)=> setUsername(e.target.value)}/>
-                    <TextField variant="outlined" fullWidth label="Senha" type="password" margin="normal"/>
-                    <Button type="submit" variant="contained" color="primary" fullWidth style={{marginTop: '20px'}}>Entrar</Button>
+                    <TextField variant="outlined" fullWidth label="Senha" type="password" margin="normal" value={password}  onChange={(e)=>setPassword(e.target.value)}/>
+                    <Button onSubmit={handleSubmit} className="button_login" type="submit" variant="contained" color="primary" fullWidth>Entrar</Button>
                 </form>
             </Paper>
         </Container>

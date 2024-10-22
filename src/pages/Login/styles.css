@@ -1,0 +1,19 @@
+.container_login{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+.card_login{
+    padding: 20px;
+}
+
+.form_login{
+    margin-top: 20px;
+}
+
+.button_login{
+    margin-top: 20px;
+}

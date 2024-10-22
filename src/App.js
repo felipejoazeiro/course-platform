@@ -1,8 +1,7 @@
-import logo from './logo.svg';
 import './App.css';
 import React, {useState} from "react";
 import { Route, Routes } from 'react-router-dom';
-import Login from './components/Login'
+import Login from './pages/Login/LoginPage'
 
 function App() {
 

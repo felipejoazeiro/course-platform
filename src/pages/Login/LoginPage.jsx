@@ -1,15 +1,20 @@
 import React, {useState} from "react";
 import { TextField, Button, Paper, Typography, Container } from '@mui/material';
+import { useNavigate } from "react-router-dom";
 import './styles.css'
 
 
 function Login({onLogin}){
+    const navigate  = useNavigate();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        onLogin();
+    }
+
+    const goToRegister = () => {
+        navigate('/register')
     }
 
     return (
@@ -23,6 +28,7 @@ function Login({onLogin}){
                     <TextField variant="outlined" fullWidth label="Senha" type="password" margin="normal" value={password}  onChange={(e)=>setPassword(e.target.value)}/>
                     <Button onSubmit={handleSubmit} className="button_login" type="submit" variant="contained" color="primary" fullWidth>Entrar</Button>
                 </form>
+                <Button onClick={goToRegister} className="button_login" variant="contained" color="warning" fullWidth>Registrar</Button>
             </Paper>
         </Container>
     );

@@ -18,8 +18,6 @@ function RegisterPage(){
         const employee = {name, registration, email};
 
         try{
-            console.log(process.env.REACT_APP_API_URL)
-            console.log(employee)
             const response = await axios.post(`${process.env.REACT_APP_API_URL}/register`,employee)
             
             console.log(response.status);
@@ -58,11 +56,11 @@ function RegisterPage(){
                     <Typography variant = "h5" align="center">
                         Registro
                     </Typography>
-                    <form className="form_login">
-                        <TextField variant="outlined" fullWidth label="Nome" margin ="normal" value={name} onChange={(e)=> setName(e.target.value)}/>
-                        <TextField variant="outlined" fullWidth label="Matricula"  margin="normal" value={registration}  onChange={(e)=>setRegistration(e.target.value)}/>
-                        <TextField variant="outlined" fullWidth label="E-mail" type="email" margin="normal" value={email}  onChange={(e)=>setEmail(e.target.value)}/>
-                        <Button onSubmit={handleSubmit} onClick={handleSubmit} className="button_login" type="submit" variant="contained" color="primary" fullWidth>Registrar</Button>
+                    <form className="form_login" onSubmit={handleSubmit} >
+                        <TextField required variant="outlined" fullWidth label="Nome" margin ="normal" value={name} onChange={(e)=> setName(e.target.value)}/>
+                        <TextField required variant="outlined" fullWidth label="Matricula"  margin="normal" value={registration}  onChange={(e)=>setRegistration(e.target.value)}/>
+                        <TextField required revariant="outlined" fullWidth label="E-mail" type="email" margin="normal" value={email}  onChange={(e)=>setEmail(e.target.value)}/>
+                        <Button className="button_login" type="submit" variant="contained" color="primary" fullWidth>Registrar</Button>
                     </form>
                     <Typography variant="body2" align="right" style={{marginTop: 10}}>
                         <Link onClick={goToLogin} href="#" style={{ color: 'blue' }}>

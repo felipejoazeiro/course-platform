@@ -1,7 +1,10 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
+from database import SessionLocal
 from models.access_table import AccessTable
 import bcrypt
+from models.user_login import Login
+
 
 from models.user_login import Login
 
@@ -15,23 +18,20 @@ def get_db():
         db.close()
 
 @router.post('/login')
-def login(registration: str, password: str, db: Session = Depends(get_db)):
+def login(login: Login, db: Session = Depends(get_db)):
     
-    
-    
-    access_record = db.query(AccessTable).filter(AccessTable.login == registration).first()
+    access_record = db.query(AccessTable).filter(AccessTable.username == login.username).first()
     if not access_record:
-        raise HTTPException(status_code=401, detail="Registro não encontrado.")
+        raise HTTPException(status_code=400, detail="Login não existe.")
     
-    if access_record.password == password and access_record.password == access_record.username:
-        raise HTTPException(status_code=402, detail="Resetar senha")
+    if not bcrypt.checkpw(login.password.encode('utf-8'), access_record.password.encode('utf-8')):
+        raise HTTPException(status_code=400, detail="Senha incorreta.")
     
-    if access_record.password == password:
+    if access_record.first_access:
+       raise HTTPException(status_code=202, detail="Resetar senha")  
+     
+    if bcrypt.checkpw(access_record.password.encode('utf-8'), login.password.encode('utf-8')):
         return{"mensagem": "Sucesso"}
-    
-    if not access_record.password == password:
-        raise HTTPException(status_code=400, detail="Senha incorreta")
-    
     
         
     return {"mensagem": "Página de login"}

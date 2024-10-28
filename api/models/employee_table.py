@@ -1,7 +1,7 @@
 from sqlalchemy import Column, SmallInteger, String
 from database import Base
 
-class RegistrationTable(Base):
+class EmployeeTable(Base):
     __tablename__ = 'employee'
     
     id = Column(SmallInteger, primary_key = True, index=True)

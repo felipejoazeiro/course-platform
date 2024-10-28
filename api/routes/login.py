@@ -28,10 +28,10 @@ def login(login: Login, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Senha incorreta.")
     
     if access_record.first_access:
-       raise HTTPException(status_code=202, detail="Resetar senha")  
+       raise HTTPException(status_code=202, detail={"message":"Resetar senha", "user_id": access_record.fk_employee})  
      
     if bcrypt.checkpw(access_record.password.encode('utf-8'), login.password.encode('utf-8')):
-        return{"message": "Sucesso"}
+        return{"message": "Sucesso", "user_id": access_record.fk_employee}
     
         
     return {"message": "Página de login", "user_id": access_record.fk_employee}

@@ -9,3 +9,4 @@ class AccessTable(Base):
     password = Column(String)
     first_access = Column(Boolean)
     fk_employee = Column(SmallInteger, index=True)
+    

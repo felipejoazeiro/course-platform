@@ -13,21 +13,29 @@ function NewPasswordPage(){
     const [message, setNewMessage] = useState('');
     const [popup, setPopup] = useState(false);
     const {userId} = useUser();
-
     const navigate = useNavigate();
     
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const passwordJson = {newPassword, userId}
+        console.log(userId)
+        const passwordJson = {id: parseInt(userId,10), password: newPassword}
+        console.log(passwordJson);
         if(newPassword !== confirmNewPassword){
             setNewMessage('As senhas não são iguais.')
             setPopup(true);
+            return;
         }else{
             try{
-                const response = await axios.post(`${process.env.REACT_APP_API_URL}/newPassword`, passwordJson)
-                goToHome();
+                const response = await axios.put(`${process.env.REACT_APP_API_URL}/newPassword`, passwordJson)
+                if(response.status === 200){
+                    goToHome();
+                }else{
+                    setNewMessage(response.data.message)
+                    setPopup(true)
+                }
             }catch(error){
-    
+                setNewMessage('Erro ao alterar a senha.')
+                setPopup(true);
             }
         }
     }

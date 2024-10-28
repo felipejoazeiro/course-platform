@@ -3,6 +3,7 @@ import axios from 'axios';
 import { TextField, Button, Paper, Typography, Container, Link, Snackbar, Alert } from '@mui/material';
 import { useNavigate } from "react-router-dom";
 import { useUser } from '../../UserContext';
+
 import './styles.css'
 
 
@@ -23,7 +24,9 @@ function Login({onLogin}){
             console.log(response)
 
             if(response.status === 202){
-                console.log('Nova Senha')
+                setUserId(response.data.detail.user_id)
+                localStorage.setItem('userId', response.data.detail.user_id);
+                navigate("/newPassword")
             }else{
                 setUserId(response.data.user_id)
             }
@@ -56,11 +59,18 @@ function Login({onLogin}){
                     <TextField required variant="outlined" fullWidth label="Senha" type="password" margin="normal" value={password}  onChange={(e)=>setPassword(e.target.value)}/>
                     <Button className="button_login" type="submit" variant="contained" color="primary" fullWidth>Entrar</Button>
                 </form>
-                <Typography variant="body2" align="right" style={{marginTop: 10}}>
+                <div style={{display: "flex", justifyContent: "space-between"}}>
+                    <Typography variant="body2" align="right" style={{marginTop: 10}}>
                         <Link onClick={goToRegister} href="#" style={{ color: 'blue' }}>
-                            Registrar
+                            Esqueci a senha
                         </Link>
                     </Typography>
+                    <Typography variant="body2" align="right" style={{marginTop: 10}}>
+                        <Link onClick={goToRegister} href="#" style={{ color: 'blue' }}>
+                            Cadastro
+                        </Link>
+                    </Typography>
+                </div>
             </Paper>
             <Snackbar open ={popupState} autoHideDuration={6000} onClose={handlePopup}>
                 <Alert onClose={handlePopup} severity="error">

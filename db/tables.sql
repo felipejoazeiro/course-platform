@@ -11,3 +11,10 @@ create table access(
 	password varchar(50) not null,
 	fk_employee int not null
 );
+
+create table verification_codes(
+	id smallserial primary key not null,
+	user_id smallserial not null,
+	code int not null,
+	created_at DATETIME not null
+);

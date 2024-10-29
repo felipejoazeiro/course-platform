@@ -1,4 +1,4 @@
-.container_new_password{
+.container_new_password, .container_verification_code{
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -6,8 +6,9 @@
     height: 100vh;
 }
 
-.card_new_password{
+.card_new_password, .card_verification_code{
     padding: 20px;
+    
 }
 
 .form_new_password{
@@ -16,4 +17,16 @@
 
 .button_new_password{
     margin-top: 20px;
+}
+
+.text-field {
+    margin-bottom: 16px;
+}
+
+.recaptcha {
+    margin: 20px 0;
+}
+
+.action-button {
+    width: 48%;
 }

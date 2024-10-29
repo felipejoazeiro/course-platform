@@ -44,6 +44,10 @@ function Login({onLogin}){
         navigate('/register')
     }
 
+    const goToVerifyCode = () => {
+        navigate("/verificationCode")
+    }
+
     const handlePopup = ()=>{
         setPopupState(false)
     }
@@ -61,7 +65,7 @@ function Login({onLogin}){
                 </form>
                 <div style={{display: "flex", justifyContent: "space-between"}}>
                     <Typography variant="body2" align="right" style={{marginTop: 10}}>
-                        <Link onClick={goToRegister} href="#" style={{ color: 'blue' }}>
+                        <Link onClick={goToVerifyCode} href="#" style={{ color: 'blue' }}>
                             Esqueci a senha
                         </Link>
                     </Typography>

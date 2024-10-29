@@ -17,9 +17,7 @@ function NewPasswordPage(){
     
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(userId)
         const passwordJson = {id: parseInt(userId,10), password: newPassword}
-        console.log(passwordJson);
         if(newPassword !== confirmNewPassword){
             setNewMessage('As senhas não são iguais.')
             setPopup(true);

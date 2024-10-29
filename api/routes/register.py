@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from pydantic import EmailStr
+from datetime import timedelta, datetime
 from database import SessionLocal
 from models.employee_table import EmployeeTable
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig, MessageType
@@ -10,6 +11,7 @@ from models.registration import Registration
 from models.verification_code import RegistrationCode
 from models.verification_codes_table import VerificationCodeTable
 from models.new_password import NewPassword
+from models.verification_request import VerificationRequest
 import bcrypt 
 import os
 import random 
@@ -86,7 +88,7 @@ def new_password(data: NewPassword, db: Session = Depends(get_db)):
 async def verification_code(registration: RegistrationCode, db: Session = Depends(get_db)):
     employee = db.query(EmployeeTable).filter(EmployeeTable.registration == registration.registration).first()
     if not employee:
-        raise HTTPException(status_code=404, detail={"message": "Usuário não encontrado"})
+        raise HTTPException(status_code=404, detail={"message": "Matrícula não encontrada"})
     
     code = random.randint(100000, 999999)
     verification_code = VerificationCodeTable(user_id= employee.id, code= code)
@@ -100,7 +102,6 @@ async def verification_code(registration: RegistrationCode, db: Session = Depend
         subtype=MessageType.html     
     )
     try:
-        
         fm = FastMail(conf)
         await fm.send_message(message)
         return {"message":"Código de verificação enviado"}
@@ -110,4 +111,19 @@ async def verification_code(registration: RegistrationCode, db: Session = Depend
 
 @router.post("/verifyCode")
 async def verify_code(verification_request: VerificationRequest, db: Session = Depends(get_db)):
-    employee = db.query(EmployeeTable).filter(EmployeeTable) 
+    employee = db.query(EmployeeTable).filter(EmployeeTable.registration == verification_request.registration).first()
+    if not employee: 
+        raise HTTPException(status_code=404, detail={"message": "Usuário não encontrado"})
+    
+    verification_code = db.query(VerificationCodeTable).filter(
+        VerificationCodeTable.user_id == employee.id,
+        VerificationCodeTable.code == verification_request.code
+    ).order_by(VerificationCodeTable.created_at.desc()).first()
+    
+    if not verification_code:
+        raise HTTPException(Status_code=400, detail="Código de verificação inválido")
+    
+    if datetime.utcnow() - verification_code.created_at > timedelta(minutes=5):
+        raise HTTPException(status_code=400, detail="Código de verificação expirado")
+    
+    return {"message": "Código de verificação válido", "user_id": employee.id}

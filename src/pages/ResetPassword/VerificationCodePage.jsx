@@ -4,7 +4,7 @@ import {Container, Button, Paper, TextField, Typography, Alert, CircularProgress
 import ReCAPTCHA from 'react-google-recaptcha';
 import { useNavigate } from "react-router-dom";
 
-const VerificationCodePage = ()=>{
+function VerificationCodePage({onLogin}){
     const [register, setRegister] = useState('')
     const [code, setCode] = useState('')
     const [message, setMessage] = useState('')
@@ -61,7 +61,7 @@ const VerificationCodePage = ()=>{
             const data = {registration: register, code: code, recaptcha: recaptchaValue}
             const response = await axios.post(`${process.env.REACT_APP_API_URL}/verifyCode`, data)
             if(response.status === 200){
-                localStorage.setItem("token", response.data.access_token);
+                onLogin(response.data.access_token)
                 navigate("/newPassword")
             }else{
                 setMessage(response.data.message)

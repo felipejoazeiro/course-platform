@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import './styles.css'
 
 
-function Login(){
+function Login({onLogin}){
     const navigate  = useNavigate();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -22,10 +22,11 @@ function Login(){
             console.log(response)
 
             if(response.status === 202){
-                localStorage.setItem("token", response.data.access_token);
+                console.log(response.data.detail.access_token)
+                onLogin(response.data.detail.access_token)
                 navigate("/newPassword")
             }else{
-                localStorage.setItem("token", response.data.access_token);
+                onLogin(response.data.access_token)
                 navigate("/dashboard")
             }
         }catch(error){

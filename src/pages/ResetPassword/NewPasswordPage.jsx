@@ -22,11 +22,16 @@ function NewPasswordPage(){
             return;
         }else{
             try{
-                console.log(localStorage.getItem('token'))
-                console.log(passwordJson)
+                const token = localStorage.getItem('token')
+                if(!token || token === undefined){
+                    setNewMessage('Entre em contato com a assistência técnica')
+                    setPopup(true);
+                    return
+                }
+                console.log(`Token: ${token}`)
                 const response = await axios.put(`${process.env.REACT_APP_API_URL}/newPassword`, passwordJson, {
                     headers: {
-                        Authorization: `Bearer ${localStorage.getItem('token')}`
+                        Authorization: `Bearer ${token}`
                     }
                 })
                 if(response.status === 200){

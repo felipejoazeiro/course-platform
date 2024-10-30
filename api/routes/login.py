@@ -29,11 +29,11 @@ def login(login: Login, db: Session = Depends(get_db)):
     if not bcrypt.checkpw(login.password.encode('utf-8'), access_record.password.encode('utf-8')):
         raise HTTPException(status_code=400, detail="Senha incorreta.")
     
-    if access_record.first_access:
-       raise HTTPException(status_code=202, detail={"message":"Resetar senha", "user_id": access_record.fk_employee})  
-     
     token_expires = timedelta(minutes=int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES")))
     access_token = create_access_token(data={"user_id": access_record.fk_employee}, expires_delta=token_expires)
     
+    if access_record.first_access:
+       raise HTTPException(status_code=202, detail={"message":"Resetar senha", "access_token": access_token, "token_type": "bearer"})  
+     
     return {"message": "Sucesso", "access_token": access_token, "token_type": "bearer"}
     

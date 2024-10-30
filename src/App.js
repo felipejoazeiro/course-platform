@@ -18,7 +18,7 @@ function App() {
     }
   }, [])
 
-  const handleLogin = (token) => {
+  const handleLogin = async (token) => {
     localStorage.setItem('token', token);
     setIsAuthenticated(true);  
   }
@@ -34,7 +34,7 @@ function App() {
           <Route path = "/" element={<Login onLogin={handleLogin}/>}/>
           <Route path = "/register" element={<RegisterPage />}/>
           <Route path = "/newPassword" element={<NewPasswordPage/>} />
-          <Route path = "/verificationCode" element={<VerificationCode />} />
+          <Route path = "/verificationCode" element={<VerificationCode onLogin={handleLogin}/>}/>
           <Route path = "/dashboard" element = {isAuthenticated ? <DashboardPage/> : <Navigate to="/"/>} /> 
       </Routes>
     </div>

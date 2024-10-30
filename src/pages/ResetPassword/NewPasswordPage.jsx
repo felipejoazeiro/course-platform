@@ -3,7 +3,6 @@ import axios from 'axios'
 import { Container,Button, Paper, Snackbar, TextField, Typography, Alert } from '@mui/material'
 import './styles.css'
 import { useNavigate } from 'react-router-dom'
-import { useUser } from '../../UserContext';
 
 
 function NewPasswordPage(){
@@ -12,19 +11,24 @@ function NewPasswordPage(){
     const [confirmNewPassword, setConfirmNewPassword] = useState('');
     const [message, setNewMessage] = useState('');
     const [popup, setPopup] = useState(false);
-    const {userId} = useUser();
     const navigate = useNavigate();
     
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const passwordJson = {id: parseInt(userId,10), password: newPassword}
+        const passwordJson = {password: newPassword}
         if(newPassword !== confirmNewPassword){
             setNewMessage('As senhas não são iguais.')
             setPopup(true);
             return;
         }else{
             try{
-                const response = await axios.put(`${process.env.REACT_APP_API_URL}/newPassword`, passwordJson)
+                console.log(localStorage.getItem('token'))
+                console.log(passwordJson)
+                const response = await axios.put(`${process.env.REACT_APP_API_URL}/newPassword`, passwordJson, {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`
+                    }
+                })
                 if(response.status === 200){
                     goToHome();
                 }else{

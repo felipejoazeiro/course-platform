@@ -3,10 +3,6 @@ import axios from 'axios'
 import {Container, Button, Paper, TextField, Typography, Alert, CircularProgress, Snackbar} from '@mui/material'
 import ReCAPTCHA from 'react-google-recaptcha';
 import { useNavigate } from "react-router-dom";
-import { useUser } from '../../UserContext';
-
-
-
 
 const VerificationCodePage = ()=>{
     const [register, setRegister] = useState('')
@@ -18,7 +14,6 @@ const VerificationCodePage = ()=>{
     const [buttonDisabled, setButtonDisabled] = useState(false)
     const [recaptchaValue, setRecaptchaValue] = useState(null)
     const navigate  = useNavigate();
-    const {setUserId} = useUser();
 
     const sendVerificationEmail = async (e) => {
         e.preventDefault();
@@ -66,9 +61,7 @@ const VerificationCodePage = ()=>{
             const data = {registration: register, code: code, recaptcha: recaptchaValue}
             const response = await axios.post(`${process.env.REACT_APP_API_URL}/verifyCode`, data)
             if(response.status === 200){
-                console.log(response.data.message)
-                setUserId(response.data.user_id)
-                localStorage.setItem('userId', response.data.user_id);
+                localStorage.setItem("token", response.data.access_token);
                 navigate("/newPassword")
             }else{
                 setMessage(response.data.message)

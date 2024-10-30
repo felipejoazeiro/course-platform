@@ -2,18 +2,16 @@ import React, {useState} from "react";
 import axios from 'axios';
 import { TextField, Button, Paper, Typography, Container, Link, Snackbar, Alert } from '@mui/material';
 import { useNavigate } from "react-router-dom";
-import { useUser } from '../../UserContext';
 
 import './styles.css'
 
 
-function Login({onLogin}){
+function Login(){
     const navigate  = useNavigate();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [popupState, setPopupState] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
-    const {setUserId} = useUser();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -24,11 +22,11 @@ function Login({onLogin}){
             console.log(response)
 
             if(response.status === 202){
-                setUserId(response.data.detail.user_id)
-                localStorage.setItem('userId', response.data.detail.user_id);
+                localStorage.setItem("token", response.data.access_token);
                 navigate("/newPassword")
             }else{
-                setUserId(response.data.user_id)
+                localStorage.setItem("token", response.data.access_token);
+                navigate("/dashboard")
             }
         }catch(error){
             if(error.response){

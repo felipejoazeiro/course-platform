@@ -12,6 +12,7 @@ from models.verification_code import RegistrationCode
 from models.verification_codes_table import VerificationCodeTable
 from models.new_password import NewPassword
 from models.verification_request import VerificationRequest
+from auth import create_access_token, get_current_user
 import bcrypt 
 import os
 import random 
@@ -62,10 +63,9 @@ def register_employee(employee: Registration, db: Session = Depends(get_db)):
     return {"message": "Funcionário registrado com sucesso."}
 
 @router.put('/newPassword')
-def new_password(data: NewPassword, db: Session = Depends(get_db)):
-    print(data.id)
-    print(data.password)
-    user_access = db.query(AccessTable).filter(AccessTable.fk_employee == data.id).first()
+def new_password(data: NewPassword, db: Session = Depends(get_db), current_user: int = Depends(get_current_user)):
+    print(data)
+    user_access = db.query(AccessTable).filter(AccessTable.fk_employee == current_user).first()
     if not user_access:
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
     
@@ -126,4 +126,7 @@ async def verify_code(verification_request: VerificationRequest, db: Session = D
     if datetime.utcnow() - verification_code.created_at > timedelta(minutes=5):
         raise HTTPException(status_code=400, detail="Código de verificação expirado")
     
-    return {"message": "Código de verificação válido", "user_id": employee.id}
+    token_expires = timedelta(minutes=int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES" )))
+    access_token = create_access_token(data={"user_id": employee.id}, expires_delta=token_expires)
+    
+    return {"message": "Código de verificação válido", "access_token": access_token, "token_type": "bearer"}

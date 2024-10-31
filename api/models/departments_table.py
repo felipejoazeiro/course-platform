@@ -1,5 +1,5 @@
 from database import Base
-from sqlalchemy import Column, SmallInteger, Text
+from sqlalchemy import Column, SmallInteger, Text, Boolean
 
 class DepartmentsTable(Base):
     __tablename__ = 'departments'

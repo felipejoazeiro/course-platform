@@ -1,4 +1,4 @@
-from sqlalchemy import Column, SmallInteger, Text
+from sqlalchemy import Column, SmallInteger, Text, String, ForeignKey, Boolean
 from database import Base
 
 class CoursesTable(Base):

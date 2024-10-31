@@ -6,7 +6,8 @@ from datetime import timedelta, datetime
 from jose import JWTError, jwt
 from models.access_table import AccessTable
 from models.user_login import Login
-from auth import create_access_token
+from models.employee_table import EmployeeTable
+from auth import create_access_token, get_current_user
 import bcrypt
 import os
 
@@ -36,4 +37,9 @@ def login(login: Login, db: Session = Depends(get_db)):
        raise HTTPException(status_code=202, detail={"message":"Resetar senha", "access_token": access_token, "token_type": "bearer"})  
      
     return {"message": "Sucesso", "access_token": access_token, "token_type": "bearer"}
-    
+
+@router.get('/getAdmin')
+def getAdmin(db: Session = Depends(get_db), current_user: int = Depends(get_current_user)):
+    access_employee = db.query(EmployeeTable).filter(EmployeeTable.id == current_user).first()
+    return {access_employee.admin}
+        

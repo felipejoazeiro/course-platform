@@ -64,7 +64,6 @@ def register_employee(employee: Registration, db: Session = Depends(get_db)):
 
 @router.put('/newPassword')
 def new_password(data: NewPassword, db: Session = Depends(get_db), current_user: int = Depends(get_current_user)):
-    print(data)
     user_access = db.query(AccessTable).filter(AccessTable.fk_employee == current_user).first()
     if not user_access:
         raise HTTPException(status_code=404, detail="Usuário não encontrado")

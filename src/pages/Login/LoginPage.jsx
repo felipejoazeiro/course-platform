@@ -19,10 +19,7 @@ function Login({onLogin}){
 
         try{
             const response = await axios.post(`${process.env.REACT_APP_API_URL}/login`, login)
-            console.log(response)
-
             if(response.status === 202){
-                console.log(response.data.detail.access_token)
                 onLogin(response.data.detail.access_token)
                 navigate("/newPassword")
             }else{

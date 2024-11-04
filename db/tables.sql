@@ -24,7 +24,7 @@ create table verification_codes(
 create table departments(
 	id smallserial primary key not null,
 	name VARCHAR(100) not null
-)
+);
 
 create table courses(
 	id smallserial primary key not null,
@@ -32,7 +32,7 @@ create table courses(
 	description TEXT,
 	department_id smallserial,
 	FOREIGN KEY (department_id) REFERENCES departments(id)
-)
+);
 
 create table employee_courses(
 	id smallserial primary key not null,
@@ -42,4 +42,12 @@ create table employee_courses(
 	FOREIGN KEY (employee_id) REFERENCES employee(id),
 	FOREIGN KEY (course_id) REFERENCES courses(id),
 	UNIQUE (employee_id, course_id)
-)
+);
+
+create table files (
+	id SERIAL PRIMARY KEY,
+	nome VARCHAR(255) NOT NULL,
+	tipo VARCHAR(50) NOT NULL,
+	caminho VARCHAR(255) NOT NULL,
+	data_upload TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

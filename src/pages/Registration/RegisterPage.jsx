@@ -19,8 +19,9 @@ function RegisterPage(){
 
         try{
             const response = await axios.post(`${process.env.REACT_APP_API_URL}/register`,employee)
+
+            console.log(response.data)
             
-            console.log(response.status);
             setMessage('Funcionário cadastrado com sucesso')
             setSeverity('success')
             setPopup(true)
@@ -31,7 +32,6 @@ function RegisterPage(){
 
         }catch(error){
             if(error.response){
-                console.log(error.response.data.detail.message)
                 setMessage(error.response.data.detail.message || 'Erro desconhecido')
             }else{
                 setMessage('Erro de rede')

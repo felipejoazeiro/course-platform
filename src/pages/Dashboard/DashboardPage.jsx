@@ -24,8 +24,8 @@ function DashboardPage ({onLogout}) {
                 const response = await axios.get(`${process.env.REACT_APP_API_URL}/getAdmin`, {headers: {
                     Authorization: `Bearer ${token}`
                 }})
+                
                 setIsAdmin(response.data)
-                console.log(response.data)
 
             } catch (error) {
                 setMessage(error.message)
@@ -53,14 +53,6 @@ function DashboardPage ({onLogout}) {
 
     }, [])
 
-    useEffect(()=>{
-        console.log(departments)
-    }, [departments])
-
-    useEffect(()=>{
-        console.log(courses)
-    }, [courses])
-
     const handleChangeDepartment = async (id, name) => {
         setLoading(true)
         try{
@@ -79,30 +71,30 @@ function DashboardPage ({onLogout}) {
             setLoading(false)
         }
     }
- 
+
     return(
         <div>
-            <Navbar isAdmin={isAdmin} onLogout={onLogout}  />
-                <div style={{ display: 'flex', height: '100vh' }}>
-                    <div style={{ width: '30%', borderRight: '1px solid #ccc', padding: '10px', overflowY: 'auto' }}>
-                        <List>
-                            {departments.map((department) => (
-                                <ListItem
-                                    button
-                                    key={department.id}
-                                    onClick={() => handleChangeDepartment(department.id, department.name)}
-                                    style={{ cursor: 'pointer' }}
-                                >
-                                    <ListItemText primary={department.name} />
-                                </ListItem>
-                            ))}
-                        </List>
-                    </div>
-                    <div style={{ width: '70%', padding: '10px', overflowY: 'auto' }}>
-                        <Typography variant='h5' gutterBottom>
-                            {selectedDepartment === null ? '' : `Cursos de ${selectedDepartment}`}
-                        </Typography>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
+            <Navbar isAdmin={isAdmin} onLogout={onLogout} />
+            <div style={{ display: 'flex', height: '100vh' }}>
+                <div style={{ width: '30%', borderRight: '1px solid #ccc', padding: '10px', overflowY: 'auto' }}>
+                    <List>
+                        {departments.map((department) => (
+                            <ListItem
+                                button // Esta propriedade deve estar correta se você estiver usando o Material-UI
+                                key={department.id}
+                                onClick={() => handleChangeDepartment(department.id, department.name)}
+                                style={{ cursor: 'pointer' }}
+                            >
+                                <ListItemText primary={department.name} />
+                            </ListItem>
+                        ))}
+                    </List>
+                </div>
+                <div style={{ width: '70%', padding: '10px', overflowY: 'auto' }}>
+                    <Typography variant='h5' gutterBottom>
+                        {selectedDepartment === null ? '' : `Cursos de ${selectedDepartment}`}
+                    </Typography>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
                         {courses.length > 0 ? (
                             courses.map((course, index) => (
                                 <Card 
@@ -115,10 +107,6 @@ function DashboardPage ({onLogout}) {
                                         borderRadius: '8px', 
                                         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)', 
                                         transition: 'transform 0.3s, box-shadow 0.3s',
-                                        '&:hover': {
-                                            transform: 'scale(1.05)', 
-                                            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)', 
-                                        }
                                     }}
                                 >
                                     <CardContent style={{ 
@@ -145,7 +133,7 @@ function DashboardPage ({onLogout}) {
                                     <CardContent style={{ 
                                         padding: '16px', 
                                         display: 'flex', 
-                                        justifyContent: 'flex-end' // Alinha o status à direita
+                                        justifyContent: 'flex-end' 
                                     }}>
                                         <Chip 
                                             label={course.completed ? "Completo" : "Incompleto"} 
@@ -154,16 +142,14 @@ function DashboardPage ({onLogout}) {
                                         />
                                     </CardContent>
                                 </Card>
-
-                        ))
-                    ) : (
+                            ))
+                        ) : (
                             <Typography variant="body2">Nenhum curso disponível.</Typography>
                         )}
                     </div>
                 </div>
             </div>
         </div>
-    )
-}
-
+    );
+};
 export default DashboardPage;

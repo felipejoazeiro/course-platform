@@ -12,7 +12,7 @@ def create_access_token(data: dict, expires_delta: timedelta= None):
         expire = datetime.utcnow() + expires_delta
     else:
         expire = datetime.utcnow() + timedelta(minutes = os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
-    to_encode.update({"exp": expire})
+    to_encode.update({"exp": expire,"iat": datetime.utcnow()})
     encoded_jwt = jwt.encode(to_encode, os.getenv("SECRET_KEY"), algorithm = os.getenv("ALGORITHM"))
     return encoded_jwt
 
@@ -31,3 +31,20 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
     except jwt.PyJWTError:
         raise credentials_exception
     return user_id
+
+
+def check_token(token: str = Depends(oauth2_scheme)):
+    try:
+        payload = jwt.decode(token, os.getenv("SECRET_KEY"), algorithms=os.getenv("ALGORITHM"))
+        create_date = datetime.fromtimestamp(payload['iat'])
+        
+        if datetime.now() - create_date > timedelta(hours=1):
+            print("Token expirado")
+            return True
+        else:
+            print("Token válido")
+            return False
+    except jwt.ExpiredSignatureError:
+        return True 
+    except jwt.InvalidTokenError:
+        return True  

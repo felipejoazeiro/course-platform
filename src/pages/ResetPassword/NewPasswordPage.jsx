@@ -28,7 +28,6 @@ function NewPasswordPage(){
                     setPopup(true);
                     return
                 }
-                console.log(`Token: ${token}`)
                 const response = await axios.put(`${process.env.REACT_APP_API_URL}/newPassword`, passwordJson, {
                     headers: {
                         Authorization: `Bearer ${token}`

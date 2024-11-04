@@ -6,6 +6,7 @@ import RegisterPage from './pages/Registration/RegisterPage'
 import NewPasswordPage from './pages/ResetPassword/NewPasswordPage';
 import VerificationCode from './pages/ResetPassword/VerificationCodePage'
 import DashboardPage from './pages/Dashboard/DashboardPage';
+import CoursePage from './pages/Courses/CoursesPage';
 import NotFoundPage from './NotFoundPage';
 import axios from 'axios';
 import ProtectedRoute from './ProtectedRoute'
@@ -15,19 +16,47 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false)
 
-  useEffect(async ()=>{
-    const token = localStorage.getItem('token')
-    if(token){
-      setIsAuthenticated(true)
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/getAdmin`, {headers: {
-          Authorization: `Bearer ${token}`
-      }})
-      setIsAdmin(response.data)
+  const checkAuthentication = async () => {
+      const token = localStorage.getItem('token')
+      if(token){
+        try {
+          const checkTokenResponse = await axios.get(`${process.env.REACT_APP_API_URL}/checkToken`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        if (checkTokenResponse.data === true) {
+            localStorage.removeItem('token');
+            setIsAuthenticated(false);
+        } else {
+            setIsAuthenticated(true);
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/getAdmin`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            console.log(response.data)
+            setIsAdmin(response.data);
+        }
+        } catch (error) {
+          console.error('Erro ao verificar o token:', error);
+                    localStorage.removeItem('token'); // Remover o token em caso de erro
+                    setIsAuthenticated(false);
+        }
+    }else{
+      setIsAuthenticated(false);
     }
-  }, [localStorage.getItem('token')])
+  };
+
+  useEffect(()=>{
+    checkAuthentication(); 
+  }, []);
 
   const handleLogin = async (token) => {
     localStorage.setItem('token', token);
+    checkAuthentication(); 
     setIsAuthenticated(true);  
   }
 
@@ -44,7 +73,7 @@ function App() {
           <Route path = "/newPassword" element={<NewPasswordPage/>} />
           <Route path = "/verificationCode" element={<VerificationCode onLogin={handleLogin}/>}/>
           <Route path = "/dashboard" element = {isAuthenticated ? <DashboardPage onLogout={handleLogout}/> : <Navigate to="/"/>} /> 
-          <Route path = "/courses" element = {<ProtectedRoute isAdmin={isAdmin}><DashboardPage /></ProtectedRoute>} />
+          <Route path = "/courses" element = {<ProtectedRoute isAdmin={isAdmin}><CoursePage onLogout={handleLogout}/></ProtectedRoute>} />
           <Route path = "/departments" element = {<ProtectedRoute isAdmin={isAdmin}><DashboardPage /></ProtectedRoute>} />
           <Route path = "/management" element = {<ProtectedRoute isAdmin={isAdmin}><DashboardPage /></ProtectedRoute>} />
           <Route path="/404" element={<NotFoundPage />} />

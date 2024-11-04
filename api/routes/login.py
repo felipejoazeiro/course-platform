@@ -7,7 +7,7 @@ from jose import JWTError, jwt
 from models.access_table import AccessTable
 from models.user_login import Login
 from models.employee_table import EmployeeTable
-from auth import create_access_token, get_current_user
+from auth import create_access_token, get_current_user, check_token
 import bcrypt
 import os
 
@@ -43,3 +43,7 @@ def getAdmin(db: Session = Depends(get_db), current_user: int = Depends(get_curr
     access_employee = db.query(EmployeeTable).filter(EmployeeTable.id == current_user).first()
     return {access_employee.admin}
         
+        
+@router.get('/checkToken')
+def checkToken(checkToken: bool = Depends(check_token)):
+    return checkToken

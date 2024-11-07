@@ -1,9 +1,13 @@
 import os
 from fastapi import APIRouter, HTTPException, Depends, File, UploadFile, Form
+from fastapi.responses import StreamingResponse
+from fastapi.responses import FileResponse
 from models.file_table import FileTable
 from models.courses_table import CoursesTable
 from sqlalchemy.orm import Session
 from database import SessionLocal
+from io import BytesIO
+
 
 router = APIRouter()
 
@@ -19,9 +23,25 @@ os.makedirs(UPLOAD_FOLDER, exist_ok = True)
 
 @router.get('/getFiles/{course_id}')
 def get_files(course_id: int,db:Session = Depends(get_db)):
-    files = db.query(FileTable).filter(FileTable.fk_course == course_id).all()
-    
+    files = db.query(FileTable).filter(FileTable.fk_course == course_id).all()    
     return files
+
+@router.get('/getFile/{file_id}')
+def get_file(file_id: int, db: Session=Depends(get_db)):
+    getFile = db.query(FileTable).filter(FileTable.id == file_id).first()
+    file_path = getFile.path
+    
+    print(file_path)
+    
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="Arquivo não encontrado")
+
+    file_like = open(file_path, "rb")
+
+
+    return StreamingResponse(file_like, media_type="application/pdf")
+    
+
 
 @router.post('/uploadFile')
 async def upload_file(courseId: int = Form(...), type: str = Form(...), file: UploadFile = File(...), db: Session = Depends(get_db)):  
@@ -39,8 +59,10 @@ async def upload_file(courseId: int = Form(...), type: str = Form(...), file: Up
         with open(file_path, "wb") as buffer:
             content = await file.read()
             buffer.write(content)
+            
+        name = ".".join(file.filename.split('.')[:-1]) 
 
-        new_file = FileTable(name=file.filename, path=file_path, fk_course=courseId, type= type)  
+        new_file = FileTable(name=name, path=file_path, fk_course=courseId, type= type)  
         db.add(new_file)
         db.commit()
         db.refresh(new_file)
@@ -70,7 +92,7 @@ async def update_file(file_id: int ,course_id: int, file: UploadFile = File(...)
         newfile_path = os.path.join(UPLOAD_FOLDER, course.title, existing_file.type, file.filename)
         
         existing_file.path = newfile_path
-        existing_file.name = file.filename
+        existing_file.name = ".".join(file.filename.split('.')[:-1])
         db.commit()
         db.refresh(existing_file) 
         

@@ -1,7 +1,10 @@
 import React, {useEffect, useState} from 'react'
 import Navbar from '../../components/Navbar';
 import axios from 'axios'
-import { ListItem, ListItemText, List, Typography, CardContent, Card, Chip} from '@mui/material';
+import {} from '@mui/material';
+import DepartmentList from './components/DepartmentList';
+import CoursesCards from './components/CoursesCards';
+import FilesList from './components/FilesList';
 
 
 function DashboardPage ({onLogout}) {
@@ -12,6 +15,10 @@ function DashboardPage ({onLogout}) {
     const [courses, setCourses] = useState([])
     const [loading, setLoading] = useState(false)
     const [selectedDepartment, setSelectedDepartment] = useState(null)
+    const [selectedCourse, setSelectedCourse] = useState(null)
+    const [typeFile, setTypeFile] = useState(null)
+    const [files, setFiles] = useState([])
+    const [showFiles, setShowFiles] = useState(false)
 
     const [message, setMessage] = useState('')
     const [severity, setSeverity] = useState('')
@@ -33,7 +40,6 @@ function DashboardPage ({onLogout}) {
                 setSeverity('error')
             }
         }
-
         getAdmin()
     }, [])
 
@@ -50,7 +56,6 @@ function DashboardPage ({onLogout}) {
             }
         }
         fetchDepartments();
-
     }, [])
 
     const handleChangeDepartment = async (id, name) => {
@@ -64,90 +69,45 @@ function DashboardPage ({onLogout}) {
             const data = response.data.courses
             setCourses(data)
             setLoading(false)
+            setShowFiles(false)
         }catch(error){
             setMessage(error.message)
             setPopup(true)
             setSeverity('error')
             setLoading(false)
+            setShowFiles(false)
         }
     }
 
+    const handleCardClick = async (id) => {
+        try {
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/getFiles/${id}`)
+            console.log(response.data)
+            setFiles(response.data)
+            setShowFiles(true)
+        } catch (error) {
+            console.log(error)
+            setShowFiles(true)
+        }
+    }
+
+
+
     return(
         <div>
-            <Navbar isAdmin={isAdmin} onLogout={onLogout} />
-            <div style={{ display: 'flex', height: '100vh' }}>
-                <div style={{ width: '30%', borderRight: '1px solid #ccc', padding: '10px', overflowY: 'auto' }}>
-                    <List>
-                        {departments.map((department) => (
-                            <ListItem
-                                button // Esta propriedade deve estar correta se você estiver usando o Material-UI
-                                key={department.id}
-                                onClick={() => handleChangeDepartment(department.id, department.name)}
-                                style={{ cursor: 'pointer' }}
-                            >
-                                <ListItemText primary={department.name} />
-                            </ListItem>
-                        ))}
-                    </List>
+            <Navbar isAdmin={isAdmin} onLogout={onLogout} style={{height: '10vh'}}/>
+            <div style={{ display: 'flex', height: '88vh' }}>
+                <div style={{ width: '15%', borderRight: '1px solid #ccc', padding: '10px', overflowY: 'auto' }}>
+                    <DepartmentList departments={departments} handleChangeDepartment={handleChangeDepartment}/>
                 </div>
-                <div style={{ width: '70%', padding: '10px', overflowY: 'auto' }}>
-                    <Typography variant='h5' gutterBottom>
-                        {selectedDepartment === null ? '' : `Cursos de ${selectedDepartment}`}
-                    </Typography>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
-                        {courses.length > 0 ? (
-                            courses.map((course, index) => (
-                                <Card 
-                                    key={index} 
-                                    style={{ 
-                                        width: 'calc(33.33% - 16px)', 
-                                        display: 'flex', 
-                                        flexDirection: 'column', 
-                                        height: '100%', 
-                                        borderRadius: '8px', 
-                                        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)', 
-                                        transition: 'transform 0.3s, box-shadow 0.3s',
-                                    }}
-                                >
-                                    <CardContent style={{ 
-                                        flexGrow: 1, 
-                                        padding: '16px', 
-                                    }}>
-                                        <Typography 
-                                            variant="h6" 
-                                            style={{ 
-                                                marginBottom: '8px', 
-                                                whiteSpace: 'nowrap', 
-                                                overflow: 'hidden', 
-                                                textOverflow: 'ellipsis', 
-                                                fontSize: '1rem',
-                                                color: '#333' 
-                                            }}
-                                        >
-                                            {course.title}
-                                        </Typography>
-                                        <Typography variant="body2" color='text.secondary'>
-                                            {course.description}
-                                        </Typography>
-                                    </CardContent>
-                                    <CardContent style={{ 
-                                        padding: '16px', 
-                                        display: 'flex', 
-                                        justifyContent: 'flex-end' 
-                                    }}>
-                                        <Chip 
-                                            label={course.completed ? "Completo" : "Incompleto"} 
-                                            color={course.completed ? "success" : "error"} 
-                                            style={{ fontWeight: 'bold' }} 
-                                        />
-                                    </CardContent>
-                                </Card>
-                            ))
-                        ) : (
-                            <Typography variant="body2">Nenhum curso disponível.</Typography>
-                        )}
-                    </div>
-                </div>
+                
+                {showFiles ? 
+                    (
+                        < FilesList files={files}/>
+                    ) : (
+                        <CoursesCards courses={courses} handleCardClick={handleCardClick} selectedDepartment={selectedDepartment}/>
+                    )
+                }
             </div>
         </div>
     );

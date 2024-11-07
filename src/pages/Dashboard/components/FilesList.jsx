@@ -1,4 +1,4 @@
-import { Typography, Card, CardContent, Button, Divider, IconButton } from "@mui/material";
+import { Typography, Card, CardContent, Button, Divider, IconButton, Box, CircularProgress } from "@mui/material";
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import SlideshowIcon from '@mui/icons-material/Slideshow';
@@ -11,31 +11,65 @@ import './styles.css'
 function FilesList({files}){
     const groupedFiles = {
         pdf:files.filter(file=>file.type === 'PDF'),
-        video: files.filter(file=>file.type === 'MP4'),
+        video: files.filter(file=>file.type === 'Video'),
         apresentacao: files.filter(file=> file.type === 'ppw')
     }
 
     const [selectedFile, setSelectedFile] = useState(null);
     const [fileURL, setFileURL] = useState(null)
+    const [fileType, setFileType] = useState('')
+    const [isLoading, setIsLoading] = useState(false)
     
     const handlePDFSelect = async (file)=>{
         try {
+            setSelectedFile(file)
+            setIsLoading(true)
             const token = localStorage.getItem('token')
-            await axios.get(`${process.env.REACT_APP_API_URL}/getFile/${file.id}`,{ headers:{
+            await axios.get(`${process.env.REACT_APP_API_URL}/getFilePDF/${file.id}`,{ headers:{
                 Authorization: `Bearer ${token}`
             },
                 responseType: 'blob'
         }).then(response=>{
                 const fileBlob = response.data
                 const fileURL = URL.createObjectURL(fileBlob)
-                console.log(fileURL)
                 setFileURL(fileURL)
-                setSelectedFile(file)
+                setFileType('PDF')
+                setIsLoading(false)
             })
         } catch (error) {
             console.log(error)
             setSelectedFile(null)
+            setIsLoading(false)
         }
+    }
+
+    const handleVideoSelect= async(file)=>{
+        try {
+            setSelectedFile(file)
+            setIsLoading(true)
+            const token = localStorage.getItem('token')
+            await axios.get(`${process.env.REACT_APP_API_URL}/getFileVideo/${file.id}`, {headers:{
+                Authorization: `Bearer ${token}`
+            },
+            responseType: 'blob'
+        }).then(response=>{
+            const fileBlob = response.data
+            const fileUrl = URL.createObjectURL(fileBlob)
+            setFileURL(fileUrl)
+            setFileType('video')
+            setIsLoading(false)
+        })
+        } catch (error) {
+            console.log(error)
+            setSelectedFile(null)
+            setIsLoading(false)
+        }
+    }
+
+    const handleBack = () =>{
+        setFileURL(null)
+        setSelectedFile(null)
+        setFileType('')
     }
 
     return(
@@ -49,28 +83,13 @@ function FilesList({files}){
                     </Typography>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px'}}>
                         {groupedFiles.pdf.map((file)=>(
-                            <div key={file.id} style={{ 
-                                width: 'calc(33.33% - 16px)', 
-                                display: 'flex', 
-                                flexDirection: 'column', 
-                                height: '100%', 
-                                borderRadius: '8px', 
-                                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)', 
-                                transition: 'transform 0.3s, box-shadow 0.3s',
-                            }}>
+                            <div key={file.id} style={{ width: 'calc(33.33% - 16px)', display: 'flex', flexDirection: 'column', height: '100%', borderRadius: '8px', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)', transition: 'transform 0.3s, box-shadow 0.3s',}}>
                                 <Card>
                                     <CardContent style={{ 
                                         flexGrow: 1, 
                                         padding: '16px', 
                                     }}>
-                                        <Typography variant="h6" style={{ 
-                                            marginBottom: '8px', 
-                                            whiteSpace: 'nowrap', 
-                                            overflow: 'hidden', 
-                                            textOverflow: 'ellipsis', 
-                                            fontSize: '1rem',
-                                            color: '#333' 
-                                        }}>
+                                        <Typography variant="h6" style={{ marginBottom: '8px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontSize: '1rem', color: '#333' }}>
                                             {file.name}
                                         </Typography>
                                         <CardContent style={{padding: '16px', display: 'flex', justifyContent:'flex-end'}}>
@@ -87,7 +106,7 @@ function FilesList({files}){
 
             {groupedFiles.apresentacao.length > 0 && (
                 <div>
-                    <Typography variant="h6" gutterBottom>
+                    <Typography variant="h5" gutterBottom>
                         Slides
                     </Typography>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
@@ -106,7 +125,14 @@ function FilesList({files}){
                                         flexGrow: 1, 
                                         padding: '16px', 
                                     }}>
-                                        <Typography variant="h6">
+                                        <Typography variant="h6" style={{
+                                            marginBottom: '8px', 
+                                            whiteSpace: 'nowrap', 
+                                            overflow: 'hidden', 
+                                            textOverflow: 'ellipsis', 
+                                            fontSize: '1rem',
+                                            color: '#333' 
+                                        }}>
                                             {file.name}
                                         </Typography>
                                         <CardContent style={{padding: '16px', display: 'flex', justifyContent:'flex-end'}}>
@@ -142,11 +168,18 @@ function FilesList({files}){
                                         flexGrow: 1, 
                                         padding: '16px', 
                                     }}>
-                                        <Typography variant="h6">
+                                        <Typography variant="h6" style={{
+                                            marginBottom: '8px', 
+                                            whiteSpace: 'nowrap', 
+                                            overflow: 'hidden', 
+                                            textOverflow: 'ellipsis', 
+                                            fontSize: '1rem',
+                                            color: '#333' 
+                                        }}>
                                             {file.name}
                                         </Typography>
                                         <CardContent style={{padding: '16px', display: 'flex', justifyContent:'flex-end'}}>
-                                            <Button className="button" variant="contained" color="primary" href={file.url} target = "_blank" startIcon={<VideoLibraryIcon/>}>Abrir Vídeo</Button>
+                                            <Button className="button" variant="contained" color="primary" href={file.url} target = "_blank" startIcon={<VideoLibraryIcon/>} onClick={()=>{handleVideoSelect(file)}}>Abrir Vídeo</Button>
                                         </CardContent>
                                     </CardContent>
                                 </Card>
@@ -157,18 +190,32 @@ function FilesList({files}){
                 </div>
             )}
             </div>) : 
-            (<div style={{display: 'flex', marginTop: '25px',justifyContent: 'center', alignItems: 'center', height: '100vh', position: 'relative' }}>
-                <IconButton  style={{ position:'absolute',top: 0, right: 0, zIndex: 10}}>
+            (
+            isLoading ? 
+            <Box display="flex" justifyContent="center" alignItems="center" height="80vh" marginTop="15px">
+                <CircularProgress size={60} />
+            </Box> 
+            :
+            <div style={{display: 'flex', marginTop: '15px',justifyContent: 'center', alignItems: 'center', height: '80vh', position: 'relative' }}>
+                <IconButton onClick={handleBack} style={{ position:'absolute',top: 0, right: 0, zIndex: 10}}>
                     <ArrowBackIcon />
                 </IconButton>
-                <div style={{ width: '80%', padding: '10px', textAlign: 'center' }}>    
-                    <h3>Exibindo PDF: {selectedFile.name}</h3>
-                    <iframe src={fileURL}
-                        width="100%"
-                        height="600px"
-                        style={{ border: 'none' }}
-                        title="PDF Viewer"/>
-                </div>
+                {fileType ==='PDF' ? 
+                    <div style={{ width: '80%', padding: '10px', textAlign: 'center' }}>    
+                        <h3>Exibindo PDF: {selectedFile.name}</h3>
+                        <iframe src={fileURL} width="100%" height="600px" style={{ border: 'none' }} title="PDF Viewer"/>
+                    </div>
+                    : fileType === 'video' ? 
+                    <div style={{ width: '80%', padding: '10px', textAlign: 'center' }}>    
+                        <h3>Exibindo Vídeo: {selectedFile.name}</h3>
+                        <Box sx={{width: '100%', maxWidth: 1200, marginBottom: 2}}>
+                            <video width="80%" height="auto" controls style={{borderRadius: '10px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}}>
+                                <source src={fileURL} type="video/mp4"/>
+                            </video>
+                        </Box>
+                    </div>
+                    : <div></div>
+                }  
             </div>
             )}
         </div>

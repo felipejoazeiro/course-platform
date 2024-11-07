@@ -1,4 +1,5 @@
 import os
+import mimetypes
 from fastapi import APIRouter, HTTPException, Depends, File, UploadFile, Form
 from fastapi.responses import StreamingResponse
 from fastapi.responses import FileResponse
@@ -26,7 +27,7 @@ def get_files(course_id: int,db:Session = Depends(get_db)):
     files = db.query(FileTable).filter(FileTable.fk_course == course_id).all()    
     return files
 
-@router.get('/getFile/{file_id}')
+@router.get('/getFilePDF/{file_id}')
 def get_file(file_id: int, db: Session=Depends(get_db)):
     getFile = db.query(FileTable).filter(FileTable.id == file_id).first()
     file_path = getFile.path
@@ -41,7 +42,22 @@ def get_file(file_id: int, db: Session=Depends(get_db)):
 
     return StreamingResponse(file_like, media_type="application/pdf")
     
-
+@router.get('/getFileVideo/{file_id}')
+def get_file_video(file_id: int, db: Session=Depends(get_db)):
+    getFile = db.query(FileTable).filter(FileTable.id == file_id).first()
+    
+    file_path = getFile.path
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="Arquivo não encontrado no servidor")
+    
+    mime_type, _ = mimetypes.guess_type(file_path)
+    
+    if mime_type is None:
+        mime_type = "application/octet-stream"
+    
+    file_like = open(file_path, "rb")
+    
+    return StreamingResponse(file_like, media_type=mime_type)
 
 @router.post('/uploadFile')
 async def upload_file(courseId: int = Form(...), type: str = Form(...), file: UploadFile = File(...), db: Session = Depends(get_db)):  

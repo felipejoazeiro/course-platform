@@ -178,9 +178,9 @@ function CoursePage(onLogout){
 
     return (
         <div>
-            <Navbar isAdmin = {isAdmin} onLogout={onLogout} />
-            <div style={{display: 'flex', height: '100vh'}}>
-                <div style={{width: '30%', borderRight: '1px solid #ccc', padding: '10px', overflowY: 'auto'}}>
+            <Navbar isAdmin = {isAdmin} onLogout={onLogout}/>
+            <div style={{display: 'flex', height: '90vh'}}>
+                <div style={{width: '20%', borderRight: '1px solid #ccc', padding: '10px', overflowY: 'auto'}}>
                     <Typography variant="h6">Departamentos</Typography>
                     { <List>
                         {departments.map((department)=>(
@@ -190,7 +190,7 @@ function CoursePage(onLogout){
                         ))}
                     </List> }
                 </div>
-                <div style={{ width: '70%', padding: '10px', overflowY: 'auto' }}>
+                <div style={{ width: '80%', padding: '10px', overflowY: 'auto' }}>
                     <Typography variant='h5' gutterBottom>
                         {selectedDepartment ? `Cursos do Departamento ${selectedDepartment}` : 'Selecione um departamento'}
                     </Typography>
@@ -269,7 +269,7 @@ function CoursePage(onLogout){
                         <input
                             type="file"
                             onChange={handleFileChange}
-                            accept={fileType === 'PDF' ? '.pdf' : fileType === 'PowerPoint' ? '.ppt,.pptx' : '.mp4'}
+                            accept={fileType === 'PDF' ? '.pdf' : fileType === 'PowerPoint' ? '.pptx' : '.mp4'}
                             style={{ display: 'block', marginBottom: '16px' }}
                         />
                     </Box>

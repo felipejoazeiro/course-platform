@@ -17,3 +17,16 @@
     border-radius: 8px;
     box-sizing: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
+
+.slick-slide {
+    margin: 0 15px;
+}
+.slick-prev, .slick-next {
+    z-index: 1;
+}
+.slick-prev {
+    left: -50px;
+}
+.slick-next {
+    right: -50px;
+}

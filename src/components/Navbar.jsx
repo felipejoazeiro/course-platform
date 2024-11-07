@@ -11,7 +11,7 @@ function Navbar({isAdmin, onLogout}) {
     }
 
     return (
-        <AppBar position = "static">
+        <AppBar position = "static" style={{height: "10vh"}}>
             <Toolbar>
                 <Typography variant='h6' style={{flexGrow: 1, color:"Black"}} component = {NavLink} to="/dashboard">
                     Logo

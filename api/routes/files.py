@@ -1,13 +1,18 @@
 import os
+import io
+import base64
 import mimetypes
 from fastapi import APIRouter, HTTPException, Depends, File, UploadFile, Form
 from fastapi.responses import StreamingResponse
 from fastapi.responses import FileResponse
+from fastapi.responses import JSONResponse
 from models.file_table import FileTable
 from models.courses_table import CoursesTable
+from PIL import Image
 from sqlalchemy.orm import Session
 from database import SessionLocal
 from io import BytesIO
+from pptx import Presentation
 
 
 router = APIRouter()
@@ -31,14 +36,11 @@ def get_files(course_id: int,db:Session = Depends(get_db)):
 def get_file(file_id: int, db: Session=Depends(get_db)):
     getFile = db.query(FileTable).filter(FileTable.id == file_id).first()
     file_path = getFile.path
-    
-    print(file_path)
-    
+        
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail="Arquivo não encontrado")
 
     file_like = open(file_path, "rb")
-
 
     return StreamingResponse(file_like, media_type="application/pdf")
     
@@ -58,6 +60,24 @@ def get_file_video(file_id: int, db: Session=Depends(get_db)):
     file_like = open(file_path, "rb")
     
     return StreamingResponse(file_like, media_type=mime_type)
+
+@router.get('/getApresentation/{file_id}')
+async def get_file_apresentation(file_id: int, db: Session=Depends(get_db)):
+    getFile = db.query(FileTable).filter(FileTable.id == file_id).first()
+    file_path = getFile.path
+    
+    """ slides_base64 = convert_ppt_to_image(file_path)
+         
+    return{"slides": slides_base64} """
+    
+    ppt = Presentation(file_path)
+    slides = []
+
+    for slide in ppt.slides:
+        img_base64 = slide_to_base64(slide)  # Converte cada slide em base64
+        slides.append(img_base64)
+
+    return {"slides": slides}
 
 @router.post('/uploadFile')
 async def upload_file(courseId: int = Form(...), type: str = Form(...), file: UploadFile = File(...), db: Session = Depends(get_db)):  

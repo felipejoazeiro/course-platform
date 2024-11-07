@@ -3,22 +3,26 @@ import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import SlideshowIcon from '@mui/icons-material/Slideshow';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+import Slider from "react-slick";
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
 import React, {useState} from "react";
 import axios from 'axios'
+import Reveal from "reveal.js";
 import './styles.css'
-
 
 function FilesList({files}){
     const groupedFiles = {
         pdf:files.filter(file=>file.type === 'PDF'),
         video: files.filter(file=>file.type === 'Video'),
-        apresentacao: files.filter(file=> file.type === 'ppw')
+        apresentacao: files.filter(file=> file.type === 'PowerPoint')
     }
 
     const [selectedFile, setSelectedFile] = useState(null);
     const [fileURL, setFileURL] = useState(null)
     const [fileType, setFileType] = useState('')
     const [isLoading, setIsLoading] = useState(false)
+    const [slidesData, setSlidesData] = useState([])
     
     const handlePDFSelect = async (file)=>{
         try {
@@ -66,10 +70,38 @@ function FilesList({files}){
         }
     }
 
+    const handlePowerPointSelect = async(file)=>{
+        try {
+            setSelectedFile(file)
+            setIsLoading(true)
+            const token = localStorage.getItem('token')
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/getApresentation/${file.id}`, {headers:{
+                Authorization: `Bearer ${token}`
+            }
+            })
+            setFileType('PowerPoint')
+            setSlidesData(response.data.slides)
+            setIsLoading(false)
+        } catch (error) {
+            console.log(error)
+            setSelectedFile(null)
+            setIsLoading(false)
+        }
+    }
+
     const handleBack = () =>{
         setFileURL(null)
         setSelectedFile(null)
         setFileType('')
+    }
+
+    const settings = {
+        dots: true,
+        infinite: true,
+        speed: 500,
+        slidesToShow: 1,
+        slidesToScroll: 1,
+        arrows: true,
     }
 
     return(
@@ -136,7 +168,7 @@ function FilesList({files}){
                                             {file.name}
                                         </Typography>
                                         <CardContent style={{padding: '16px', display: 'flex', justifyContent:'flex-end'}}>
-                                            <Button className="button" variant="contained" color="primary" href={file.url} target = "_blank" startIcon={<SlideshowIcon/>}>Abrir Apresentação</Button>
+                                            <Button className="button" variant="contained" color="primary" href={file.url} target = "_blank" startIcon={<SlideshowIcon/>} onClick={()=>handlePowerPointSelect(file)}>Abrir Apresentação</Button>
                                         </CardContent>
                                     </CardContent>
                                 </Card>
@@ -214,7 +246,21 @@ function FilesList({files}){
                             </video>
                         </Box>
                     </div>
-                    : <div></div>
+                    : fileType === 'PowerPoint' ? 
+                    <div>
+                        {slidesData.map((slide, index) => (
+                        <div key={index}>
+                            <img
+                                key={index}
+                                src={`data:image/png;base64,${slide}`}
+                                alt={`Slide ${index + 1}`}
+                                style={{ width: '100%', maxWidth: '800px', marginRight: '20px' }}
+                            />
+                        </div>
+                        ))}
+                    </div>
+                    : 
+                        <div></div>
                 }  
             </div>
             )}

@@ -22,7 +22,7 @@ function Navbar({isAdmin, onLogout}) {
                         <Button variant='contained' component={NavLink} to="/courses" style={({ isActive }) => ({ color: isActive ? 'yellow' : 'white' })}> Cursos </Button>
                         <Button variant='contained' component={NavLink} to="/management" style={({ isActive }) => ({ color: isActive ? 'yellow' : 'white' })}> Gestão </Button>
                     </Box>
-            )}
+                )}
                 <IconButton color = "inherit" onClick={logout}> <ExitToAppIcon /> </IconButton>
             </Toolbar>
         </AppBar>

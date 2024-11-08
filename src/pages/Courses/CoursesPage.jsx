@@ -120,7 +120,7 @@ function CoursePage(onLogout){
             console.log(`${pair[0]}: ${pair[1].name || pair[1]}`);
         }
         try{
-            const response = await axios.post(`${process.env.REACT_APP_API_URL}/${fileType == 'PowerPoint' ? 'uploadPPT' : 'uploadFile'}`, formData,{headers: {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/${fileType === 'PowerPoint' ? 'uploadPPT' : 'uploadFile'}`, formData,{headers: {
                 Authorization: `Bearer ${token}`,
             }});
             console.log('Upload bem sucedido:' , response.data)
@@ -176,6 +176,15 @@ function CoursePage(onLogout){
         setFiles(response.data)
     }
 
+    const handlePPTDelete = async (fileId)=>{
+        try{
+            await axios.delete(`${process.env.REACT_APP_API_URL}/deletePPT/${fileId}`)
+        }catch(error){
+            console.error('Erro ao deletar arquivo')
+        }
+        
+    }
+
     return (
         <div>
             <Navbar isAdmin = {isAdmin} onLogout={onLogout}/>
@@ -228,8 +237,9 @@ function CoursePage(onLogout){
                                 <List>
                                     {files.map((file) => (
                                         <ListItem key={file.id}>
-                                            <ListItemText primary={file.name} />
-                                            <Button 
+                                            <ListItemText primary={`${file.name} (${file.type})`} />
+                    
+                                            {file.type === "PowerPoint" ? <div></div> :  <Button 
                                                 variant="outlined" 
                                                 color="primary" 
                                                 startIcon={<CloudUploadIcon />} 
@@ -237,12 +247,12 @@ function CoursePage(onLogout){
                                                 style={{ marginRight: '8px' }}
                                             >
                                                 Substituir
-                                            </Button>
+                                            </Button>}
                                             <Button 
                                                 variant="outlined" 
                                                 color="error" 
                                                 startIcon={<DeleteIcon />} 
-                                                onClick={() => handleFileDelete(file.id)} 
+                                                onClick={() => {file.type === 'PowerPoint' ? handlePPTDelete(file.id) :  handleFileDelete(file.id)}} 
                                             >
                                                 Deletar
                                             </Button>

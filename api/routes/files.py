@@ -2,6 +2,8 @@ import os
 import io
 import base64
 import mimetypes
+import unicodedata
+import re
 from fastapi import APIRouter, HTTPException, Depends, File, UploadFile, Form
 from fastapi.responses import StreamingResponse
 from fastapi.responses import FileResponse
@@ -13,7 +15,8 @@ from sqlalchemy.orm import Session
 from database import SessionLocal
 from io import BytesIO
 from pptx import Presentation
-
+import unicodedata
+import re
 
 router = APIRouter()
 
@@ -61,24 +64,6 @@ def get_file_video(file_id: int, db: Session=Depends(get_db)):
     
     return StreamingResponse(file_like, media_type=mime_type)
 
-@router.get('/getApresentation/{file_id}')
-async def get_file_apresentation(file_id: int, db: Session=Depends(get_db)):
-    getFile = db.query(FileTable).filter(FileTable.id == file_id).first()
-    file_path = getFile.path
-    
-    """ slides_base64 = convert_ppt_to_image(file_path)
-         
-    return{"slides": slides_base64} """
-    
-    ppt = Presentation(file_path)
-    slides = []
-
-    for slide in ppt.slides:
-        img_base64 = slide_to_base64(slide)  # Converte cada slide em base64
-        slides.append(img_base64)
-
-    return {"slides": slides}
-
 @router.post('/uploadFile')
 async def upload_file(courseId: int = Form(...), type: str = Form(...), file: UploadFile = File(...), db: Session = Depends(get_db)):  
     
@@ -87,7 +72,15 @@ async def upload_file(courseId: int = Form(...), type: str = Form(...), file: Up
     
     course = db.query(CoursesTable).filter(CoursesTable.id == courseId).first()
     
-    file_path = os.path.join(UPLOAD_FOLDER, course.title, type ,file.filename)
+    normalized_name = unicodedata.normalize('NFKD', course.title).encode('ascii', 'ignore').decode('ascii')
+
+    safe_name = re.sub(r'[^a-zA-Z0-9]', '-', normalized_name)
+
+    safe_name = re.sub(r'-+', '-', safe_name)
+
+    safe_name = safe_name.strip('-')
+
+    file_path = os.path.join(UPLOAD_FOLDER, safe_name, type ,file.filename)
 
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
 

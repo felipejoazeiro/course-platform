@@ -120,7 +120,7 @@ function CoursePage(onLogout){
             console.log(`${pair[0]}: ${pair[1].name || pair[1]}`);
         }
         try{
-            const response = await axios.post(`${process.env.REACT_APP_API_URL}/uploadFile`, formData,{headers: {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/${fileType == 'PowerPoint' ? 'uploadPPT' : 'uploadFile'}`, formData,{headers: {
                 Authorization: `Bearer ${token}`,
             }});
             console.log('Upload bem sucedido:' , response.data)

@@ -32,7 +32,7 @@ function FilesList({files}){
             await axios.get(`${process.env.REACT_APP_API_URL}/getFilePDF/${file.id}`,{ headers:{
                 Authorization: `Bearer ${token}`
             },
-                responseType: 'blob'
+            responseType: 'blob'
         }).then(response=>{
                 const fileBlob = response.data
                 const fileURL = URL.createObjectURL(fileBlob)
@@ -79,8 +79,10 @@ function FilesList({files}){
                 Authorization: `Bearer ${token}`
             }
             })
+            const slidesUrl = `https://docs.google.com/presentation/d/${response.data.slidesFileId}/embed`;
+            console.log(slidesUrl)
             setFileType('PowerPoint')
-            setSlidesData(response.data.slides)
+            setFileURL(slidesUrl)
             setIsLoading(false)
         } catch (error) {
             console.log(error)
@@ -247,20 +249,16 @@ function FilesList({files}){
                         </Box>
                     </div>
                     : fileType === 'PowerPoint' ? 
-                    <div>
-                        {slidesData.map((slide, index) => (
-                        <div key={index}>
-                            <img
-                                key={index}
-                                src={`data:image/png;base64,${slide}`}
-                                alt={`Slide ${index + 1}`}
-                                style={{ width: '100%', maxWidth: '800px', marginRight: '20px' }}
-                            />
-                        </div>
-                        ))}
+                    <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+                        <iframe
+                            src={fileURL}
+                            width="100%"
+                            height="600px"
+                            title="PowerPoint Viewer"
+                        />
                     </div>
                     : 
-                        <div></div>
+                        <div>Algo</div>
                 }  
             </div>
             )}

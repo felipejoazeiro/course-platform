@@ -113,9 +113,7 @@ async def update_file(file_id: int ,course_id: int, file: UploadFile = File(...)
     try:
         
         file_path = os.path.join(UPLOAD_FOLDER, course.title, existing_file.type, existing_file.name)
-        
-        print(existing_file.path)
-        
+                
         os.remove(existing_file.path)
 
         newfile_path = os.path.join(UPLOAD_FOLDER, course.title, existing_file.type, file.filename)
@@ -132,7 +130,6 @@ async def update_file(file_id: int ,course_id: int, file: UploadFile = File(...)
         return {"message": "Arquivo atualizado com sucesso."}
     except Exception as e:
         db.rollback()  
-        print(f"Erro ao atualizar o arquivo: {e}")
         raise HTTPException(status_code=500, detail=f"Erro ao atualizar o arquivo: {str(e)}")
     
 @router.delete('/deleteFile/{file_id}')

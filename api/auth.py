@@ -24,7 +24,6 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
     )
     try:
         payload = jwt.decode(token, os.getenv("SECRET_KEY"), algorithms=os.getenv("ALGORITHM"))
-        print(payload)
         user_id = payload.get("user_id")
         if user_id is None:
             raise credentials_exception
@@ -39,10 +38,8 @@ def check_token(token: str = Depends(oauth2_scheme)):
         create_date = datetime.fromtimestamp(payload['iat'])
         
         if datetime.now() - create_date > timedelta(hours=1):
-            print("Token expirado")
             return True
         else:
-            print("Token válido")
             return False
     except jwt.ExpiredSignatureError:
         return True 

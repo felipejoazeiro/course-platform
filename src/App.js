@@ -1,6 +1,6 @@
 import './App.css';
 import React, {useState, useEffect} from "react";
-import { Route, Routes, Navigate } from 'react-router-dom';
+import { Route, Routes, Navigate, useNavigate } from 'react-router-dom';
 import Login from './pages/Login/LoginPage'
 import RegisterPage from './pages/Registration/RegisterPage'
 import NewPasswordPage from './pages/ResetPassword/NewPasswordPage';
@@ -15,6 +15,7 @@ function App() {
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false)
+  const navigate = useNavigate()
 
   const checkAuthentication = async () => {
       const token = localStorage.getItem('token')
@@ -63,6 +64,7 @@ function App() {
   const handleLogout = async () => {
     localStorage.removeItem('token')
     setIsAuthenticated(false)
+    navigate("/")
   }
 
   return (
@@ -74,8 +76,8 @@ function App() {
           <Route path = "/verificationCode" element={<VerificationCode onLogin={handleLogin}/>}/>
           <Route path = "/dashboard" element = {isAuthenticated ? <DashboardPage onLogout={handleLogout}/> : <Navigate to="/"/>} /> 
           <Route path = "/courses" element = {<ProtectedRoute isAdmin={isAdmin}><CoursePage onLogout={handleLogout}/></ProtectedRoute>} />
-          <Route path = "/departments" element = {<ProtectedRoute isAdmin={isAdmin}><DashboardPage /></ProtectedRoute>} />
-          <Route path = "/management" element = {<ProtectedRoute isAdmin={isAdmin}><DashboardPage /></ProtectedRoute>} />
+          <Route path = "/departments" element = {<ProtectedRoute isAdmin={isAdmin}><DashboardPage onLogout={handleLogout}/></ProtectedRoute>} />
+          <Route path = "/management" element = {<ProtectedRoute isAdmin={isAdmin}><DashboardPage onLogout={handleLogout}/></ProtectedRoute>} />
           <Route path="/404" element={<NotFoundPage />} />
           <Route path="*" element={<Navigate to="/404" />} />
       </Routes>

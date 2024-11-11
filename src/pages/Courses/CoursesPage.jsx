@@ -9,7 +9,7 @@ import Slideshow from '@mui/icons-material/Slideshow';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import axios from 'axios'
 
-function CoursePage(onLogout){
+function CoursePage({onLogout}){
     const [isAdmin, setIsAdmin] = useState(false)
 
     const [departments, setDepartments] = useState([])
@@ -26,6 +26,8 @@ function CoursePage(onLogout){
     const [newCourse, setNewCourse] = useState('')
     const [popupNewCourse, setPopupNewCourse] = useState(false)
     const [newDescription, setNewDescription] = useState('')
+    const [newDepartment, setNewDepartment] = useState('')
+    const [popupNewDepartment, setPopupNewDepartment] = useState(false)
 
 
     const [message, setMessage] = useState('')
@@ -79,6 +81,7 @@ function CoursePage(onLogout){
             },  params: {"department_id": departmentId}, })
             const data = response.data.courses
             setCourses(data)
+            setFiles([])
         }catch(error){
             setMessage(error.message)
             setPopup(true)
@@ -217,19 +220,39 @@ function CoursePage(onLogout){
         }
     }
 
+    const handleAddNewDepartment = async (e)=>{
+        try {
+            e.preventDefault()
+            const token = localStorage.getItem('token')
+            console.log(newDepartment)
+            const formData = new FormData();
+            formData.append('name', newDepartment)
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/newDepartment`, formData, {headers:{
+                Authorization: `Bearer ${token}`,
+            }})
+            setMessage(response.data.message)
+            setNewDepartment('')
+            setSeverity('success')
+            setPopup(true)
+            handleDepartmentClick(departments[0].id)
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
     return (
         <div>
             <Navbar isAdmin = {isAdmin} onLogout={onLogout}/>
             <div style={{display: 'flex', height: '90vh'}}>
-                <div style={{width: '20%', borderRight: '1px solid #ccc', padding: '10px', overflowY: 'auto'}}>
-                    <Typography variant="h6">Departamentos</Typography>
-                    { <List>
+                <div style={{display:'flex', flexDirection:'column', justifyContent:'space-between', width: '20%', borderRight: '1px solid #ccc', padding: '10px', overflowY: 'auto'}}>
+                    <List>
                         {departments.map((department)=>(
                             <ListItem button key={department.id} onClick={()=>handleDepartmentClick(department.id)}>
                                 <ListItemText primary={department.name} />
                             </ListItem>
                         ))}
-                    </List> }
+                    </List>
+                    <Button className="button_login" variant="contained" color="primary" fullWidth onClick={()=>setPopupNewDepartment(true)} >Novo departamento</Button>
                 </div>
                 <div style={{ width: '80%', padding: '10px', overflowY: 'auto' }}>
                     <Typography variant='h5' gutterBottom>
@@ -293,8 +316,8 @@ function CoursePage(onLogout){
                                 </List>
                             </div>
                         )}
-                    {selectedDepartment && (<div>
-                        <Button onClick={()=>setPopupNewCourse(true)}>Novo Curso</Button>
+                    {selectedDepartment && (<div style={{display:'flex', justifyContent:'flex-end'}}>
+                        <Button onClick={()=>setPopupNewCourse(true)} variant="outlined" size='medium' >Novo Curso</Button>
                     </div>)}
                 </div>
                 <Dialog open={openDialog} onClose={handleDialogClose} maxWidth="sm" fullWidth>
@@ -338,13 +361,28 @@ function CoursePage(onLogout){
                         <Box mt={2}>
                             <form onSubmit={handleAddNewCourse}>
                                 <TextField required variant="outlined" fullWidth label="Novo Curso" margin="normal" value={newCourse} onChange={(e)=> setNewCourse(e.target.value)}/>
-                                <TextField required variant="outlined" fullWidth label="Descrição" margin="normal" value={newDescription} onChange={(e)=>setNewDescription(e.target.value)}/>
+                                <TextField required variant="outlined" multiline fullWidth label="Descrição" margin="normal" value={newDescription} onChange={(e)=>setNewDescription(e.target.value)}/>
                                 <Button className="button_login" type="submit" variant="contained" color="primary" fullWidth>Registrar</Button>
                             </form>
                         </Box>
                     </DialogContent>
                 </Dialog>
-
+                <Dialog open={popupNewDepartment} onClose={()=>setPopupNewDepartment(false)} PaperProps={{style: {backdropFilter: 'blur(10px)', background: 'rgba(255,255,255,0.8)'}}}>
+                    <DialogTitle sx={{display: 'flex', alignItems:'center', justifyContent: 'space-between'}}>
+                        <Typography variant='h6'>Adicionar Novo Departamento</Typography>
+                        <IconButton edge="end" color='inherit' onClick={()=>setPopupNewDepartment(false)}>
+                            <CloseIcon/>
+                        </IconButton>
+                    </DialogTitle>
+                    <DialogContent>
+                        <Box mt={2}>
+                            <form onSubmit = {handleAddNewDepartment}>
+                                <TextField required variant="outlined" fullWidth label="Novo departamento" margin="normal" value={newDepartment} onChange={(e)=>setNewDepartment(e.target.value)} />
+                                <Button className='button_login' type="submit" variant="contained" color='primary' fullWidth >Registrar</Button>
+                            </form>
+                        </Box>
+                    </DialogContent>
+                </Dialog>
             </div>
         </div>
     );

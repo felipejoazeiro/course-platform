@@ -62,7 +62,6 @@ async def upload_PPT(courseId: int = Form(...), type: str = Form(...), file: Upl
     safe_name = safe_name.strip('-')
     
     destination_blob_name = f"uploads/{safe_name}/{file_name}"
-    print(os.getenv('GOOGLE_APPLICATION_CREDENTIALS'))    
     try:
         file_url = upload_to_google_cloud(file, BUCKET_NAME, destination_blob_name)
         

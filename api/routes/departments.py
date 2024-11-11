@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Form
 from models.department import Department
 from models.departments_table import DepartmentsTable
 from sqlalchemy.orm import Session
@@ -15,12 +15,12 @@ def get_db():
         db.close()
         
 @router.post('/newDepartment')
-def newDepartment(department: Department, db:Session = Depends(get_db)):
-    existingDepartment = db.query(DepartmentsTable).filter(DepartmentsTable.name == department.name).first()
+def newDepartment(name: str = Form(...), db:Session = Depends(get_db)):
+    existingDepartment = db.query(DepartmentsTable).filter(DepartmentsTable.name == name).first()
     if existingDepartment:
         raise HTTPException(status_code= 400, detail={"message": "Departamento já existente"})
     
-    db_department = DepartmentsTable(**department.dict())
+    db_department = DepartmentsTable(name= name)
     db.add(db_department)
     db.commit()
     db.refresh(db_department)

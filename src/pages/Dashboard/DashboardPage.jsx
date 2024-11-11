@@ -91,8 +91,6 @@ function DashboardPage ({onLogout}) {
         }
     }
 
-
-
     return(
         <div>
             <Navbar isAdmin={isAdmin} onLogout={onLogout} style={{height: '10vh'}}/>

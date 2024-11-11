@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react'
 
-import {List, ListItem, ListItemText, Button, Typography, Dialog, DialogTitle, DialogActions, IconButton, Box} from '@mui/material'
+import {List, ListItem, ListItemText, Button, Typography, Dialog, DialogTitle, DialogActions, DialogContent, TextField,IconButton, Box} from '@mui/material'
 import Navbar from '../../components/Navbar'
 import CloseIcon from '@mui/icons-material/Close';
 import { Delete as DeleteIcon, CloudUpload as CloudUploadIcon } from '@mui/icons-material';
@@ -23,6 +23,10 @@ function CoursePage(onLogout){
     const [currentFile, setCurrentFile] = useState(null)
     const [files, setFiles] = useState([])
     const [already, setAlready] = useState(0)
+    const [newCourse, setNewCourse] = useState('')
+    const [popupNewCourse, setPopupNewCourse] = useState(false)
+    const [newDescription, setNewDescription] = useState('')
+
 
     const [message, setMessage] = useState('')
     const [severity, setSeverity] = useState('')
@@ -185,6 +189,34 @@ function CoursePage(onLogout){
         
     }
 
+    const handleAddNewCourse = async (e)=>{
+        try {
+            e.preventDefault()
+            const token = localStorage.getItem('token')
+            const formData = new FormData();
+            formData.append('title', newCourse)
+            formData.append('description', newDescription)
+            formData.append('department_id', selectedDepartment)
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/newCourse`, formData, {headers:{
+                Authorization: `Bearer ${token}`,
+            }})
+            console.log(`Adicionado com sucesso! : ${response.data}`)
+            setNewCourse('')
+            setNewDescription('')
+            setMessage(response.data.message)
+            setSeverity('success')
+            setPopup(true)
+            handleDepartmentClick(selectedDepartment)      
+        } catch (error) {
+            setNewCourse('')
+            setNewDescription('')
+            setMessage("Erro ao criar novo curso.")
+            setSeverity('error')
+            setPopup(true)
+            handleDepartmentClick(selectedDepartment)      
+        }
+    }
+
     return (
         <div>
             <Navbar isAdmin = {isAdmin} onLogout={onLogout}/>
@@ -261,7 +293,10 @@ function CoursePage(onLogout){
                                 </List>
                             </div>
                         )}
-                    </div>
+                    {selectedDepartment && (<div>
+                        <Button onClick={()=>setPopupNewCourse(true)}>Novo Curso</Button>
+                    </div>)}
+                </div>
                 <Dialog open={openDialog} onClose={handleDialogClose} maxWidth="sm" fullWidth>
                     <DialogTitle>
                         {`Adicionar arquivo para ${currentCourse?.title}`}
@@ -292,6 +327,24 @@ function CoursePage(onLogout){
                         </Button>
                     </DialogActions>
                 </Dialog>
+                <Dialog open ={popupNewCourse} onClose={()=>setPopupNewCourse(false)} PaperProps={{style: {backdropFilter: 'blur(10px)', background: 'rgba(255,255,255,0.8)'}}} >
+                    <DialogTitle sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+                        <Typography variant="h6">Adicionar Novo Curso</Typography>
+                        <IconButton edge="end" color='inherit' onClick={()=>setPopupNewCourse(false)}>
+                            <CloseIcon/>
+                        </IconButton>
+                    </DialogTitle>
+                    <DialogContent>
+                        <Box mt={2}>
+                            <form onSubmit={handleAddNewCourse}>
+                                <TextField required variant="outlined" fullWidth label="Novo Curso" margin="normal" value={newCourse} onChange={(e)=> setNewCourse(e.target.value)}/>
+                                <TextField required variant="outlined" fullWidth label="Descrição" margin="normal" value={newDescription} onChange={(e)=>setNewDescription(e.target.value)}/>
+                                <Button className="button_login" type="submit" variant="contained" color="primary" fullWidth>Registrar</Button>
+                            </form>
+                        </Box>
+                    </DialogContent>
+                </Dialog>
+
             </div>
         </div>
     );

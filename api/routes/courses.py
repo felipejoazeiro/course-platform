@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends, FastAPI
+from fastapi import APIRouter, HTTPException, Depends, FastAPI, Form
 from sqlalchemy.orm import Session
 from database import SessionLocal
 from models.course import Course
@@ -19,12 +19,12 @@ def get_db():
         db.close()
         
 @router.post('/newCourse')
-def newCourse(course: Course, db: Session = Depends(get_db)):
-    existingCourse = db.query(CoursesTable).filter(CoursesTable.title == course.title, CoursesTable.department_id == course.department_id).first()
+def newCourse(title: str=Form(...), description: str=Form(...), department_id: int=Form(...), db: Session = Depends(get_db)):
+    existingCourse = db.query(CoursesTable).filter(CoursesTable.title == title, CoursesTable.department_id == department_id).first()
     if existingCourse:
         raise HTTPException(status_code= 400, detail={"message": "Curso já existente"})
     
-    db_course = CoursesTable(**course.dict())
+    db_course = CoursesTable(title=title, description=description, department_id=department_id)
     db.add(db_course)
     db.commit()
     db.refresh(db_course)

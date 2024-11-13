@@ -4,8 +4,10 @@ from database import SessionLocal
 from models.course import Course
 from models.courses_table import CoursesTable
 from models.get_course import GetCourse
+from models.employee_table import EmployeeTable
 from models.employee_courses import EmployeeCoursesTable
 from models.course_complete import CourseComplete
+from models.departments_table import DepartmentsTable
 from auth import get_current_user
 
 
@@ -62,3 +64,20 @@ def completeCourse(courseComplete: CourseComplete, db: Session = Depends(get_db)
     db.refresh(db_course_complete)
     
     return{"message": "Curso completado!"}
+
+@router.get('/employee/completed_courses')
+def get_completed_courses(db:Session=Depends(get_db)):
+    
+    employees = db.query(EmployeeTable).all()
+    
+    employee_list = []
+    
+    for employee in employees:
+        courses = (db.query(CoursesTable.id.label("id"), CoursesTable.title.label("title"), DepartmentsTable.name.label("department_name"), EmployeeCoursesTable.completion_date.label("completion_date")).join(EmployeeCoursesTable, EmployeeCoursesTable.course_id==CoursesTable.id).join(DepartmentsTable, CoursesTable.department_id==DepartmentsTable.id).filter(EmployeeCoursesTable.employee_id == employee.id)).all()
+        employee_data = {"id": employee.id, "name": employee.name, "register": employee.registration, "email": employee.email,"courses":[{"id":course.id, "title": course.title, "department_name": course.department_name, "completion_date": course.completion_date} for course in courses]}
+        
+        employee_list.append(employee_data)
+
+
+    return {"lista":employee_list}
+    

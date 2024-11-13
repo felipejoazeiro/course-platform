@@ -10,6 +10,7 @@ import CoursePage from './pages/Courses/CoursesPage';
 import NotFoundPage from './NotFoundPage';
 import axios from 'axios';
 import ProtectedRoute from './ProtectedRoute'
+import ManagerPage from './pages/Manager/ManagerPage';
 
 function App() {
 
@@ -76,8 +77,7 @@ function App() {
           <Route path = "/verificationCode" element={<VerificationCode onLogin={handleLogin}/>}/>
           <Route path = "/dashboard" element = {isAuthenticated ? <DashboardPage onLogout={handleLogout}/> : <Navigate to="/"/>} /> 
           <Route path = "/courses" element = {<ProtectedRoute isAdmin={isAdmin}><CoursePage onLogout={handleLogout}/></ProtectedRoute>} />
-          <Route path = "/departments" element = {<ProtectedRoute isAdmin={isAdmin}><DashboardPage onLogout={handleLogout}/></ProtectedRoute>} />
-          <Route path = "/management" element = {<ProtectedRoute isAdmin={isAdmin}><DashboardPage onLogout={handleLogout}/></ProtectedRoute>} />
+          <Route path = "/management" element = {<ProtectedRoute isAdmin={isAdmin}><ManagerPage onLogout={handleLogout}/></ProtectedRoute>} />
           <Route path="/404" element={<NotFoundPage />} />
           <Route path="*" element={<Navigate to="/404" />} />
       </Routes>

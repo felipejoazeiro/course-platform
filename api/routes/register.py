@@ -107,7 +107,6 @@ async def verification_code(registration: RegistrationCode, db: Session = Depend
     except Exception as e:
         print(e)    
         
-
 @router.post("/verifyCode")
 async def verify_code(verification_request: VerificationRequest, db: Session = Depends(get_db)):
     employee = db.query(EmployeeTable).filter(EmployeeTable.registration == verification_request.registration).first()

@@ -258,7 +258,7 @@ function FilesList({files}){
                         />
                     </div>
                     : 
-                        <div>Algo</div>
+                    <div>Algo</div>
                 }  
             </div>
             )}

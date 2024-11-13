@@ -61,7 +61,15 @@ async def upload_PPT(courseId: int = Form(...), type: str = Form(...), file: Upl
 
     safe_name = safe_name.strip('-')
     
-    destination_blob_name = f"uploads/{safe_name}/{file_name}"
+    normalized_file_name = unicodedata.normalize('NFKD', file_name).encode('ascii', 'ignore').decode('ascii')
+    
+    safe_file_name = re.sub(r'[^a-zA-Z0-9]', '-', normalized_file_name)
+    
+    safe_file_name = re.sub(r'-+', '-', safe_file_name)
+    
+    safe_file_name = safe_file_name.strip('-')
+    
+    destination_blob_name = f"uploads/{safe_name}/{safe_file_name}"
     try:
         file_url = upload_to_google_cloud(file, BUCKET_NAME, destination_blob_name)
         

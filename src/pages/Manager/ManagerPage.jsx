@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react'
-import {Table, Paper, TablePagination, Box, IconButton, TableContainer, TableHead, TableRow, TableCell, TableBody, Collapse, Typography} from '@mui/material'
+import {Table, Paper, TablePagination, Snackbar, Dialog, Alert, Box, IconButton, TableContainer, TableHead, TableRow, TableCell, TableBody, Collapse, Typography} from '@mui/material'
 import PropTypes from 'prop-types'
 import FirstPageIcon from '@mui/icons-material/FirstPage';
 import LastPageIcon from '@mui/icons-material/LastPage';
@@ -19,11 +19,10 @@ function ManagerPage({onLogout}){
     const[newName, setNewName] = useState('')
     const[newRegister, setNewRegister] = useState('')
     const[newDialog, setNewDialog] = useState(false)
-    const[open, setOpen]=useState(false)
 
     const[message, setMessage] = useState('')
     const[severity, setSeverity] = useState('')
-    const[popUp, setPopup]= useState(false)
+    const[popup, setPopup]= useState(false)
 
     const token = localStorage.getItem('token')
 
@@ -61,6 +60,10 @@ function ManagerPage({onLogout}){
         getEmployeeList()
     },[token])
 
+
+    const handlePopup = ()=>{
+        setPopup(false)
+    }
 
     function TablePaginationActions(props){
         const theme = useTheme()
@@ -233,6 +236,14 @@ function ManagerPage({onLogout}){
                     ActionsComponent={TablePaginationActions}
                 />
             </div>
+            <Dialog open={newDialog} onClose={()=>setNewDialog(false)} PaperProps={{style: {backdropFilter: 'blue(10px)', background: 'rgba(255,255,255,0.8)'}}} >
+                            
+            </Dialog>
+            <Snackbar open={popup} autoHideDuration = {6000} onClose={handlePopup}>
+                <Alert onClose={handlePopup} severity={severity} >
+                    {message}
+                </Alert>
+            </Snackbar>
         </div>
     )
 }

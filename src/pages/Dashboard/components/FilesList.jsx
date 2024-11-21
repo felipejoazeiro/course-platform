@@ -1,4 +1,4 @@
-import { Typography, Card, CardContent, Button, Divider, IconButton, Box, CircularProgress } from "@mui/material";
+import { Typography, Card, CardContent, Button, Divider, IconButton, Alert, Box, CircularProgress, Snackbar } from "@mui/material";
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import SlideshowIcon from '@mui/icons-material/Slideshow';
@@ -22,7 +22,9 @@ function FilesList({files}){
     const [fileURL, setFileURL] = useState(null)
     const [fileType, setFileType] = useState('')
     const [isLoading, setIsLoading] = useState(false)
-    const [slidesData, setSlidesData] = useState([])
+    const [message, setMessage] = useState('')
+    const [popup, setPopup] = useState(false)
+    const [severity, setSeverity] = useState('error')
     
     const handlePDFSelect = async (file)=>{
         try {
@@ -44,6 +46,7 @@ function FilesList({files}){
             console.log(error)
             setSelectedFile(null)
             setIsLoading(false)
+            setSeverity('error')
         }
     }
 
@@ -97,13 +100,8 @@ function FilesList({files}){
         setFileType('')
     }
 
-    const settings = {
-        dots: true,
-        infinite: true,
-        speed: 500,
-        slidesToShow: 1,
-        slidesToScroll: 1,
-        arrows: true,
+    const handlePopup=()=>{
+        setPopup(false)
     }
 
     return(
@@ -262,6 +260,11 @@ function FilesList({files}){
                 }  
             </div>
             )}
+            <Snackbar open={popup} autoHideDuration = {6000} onClose={handlePopup}>
+                <Alert onClose={handlePopup} severity={severity} >
+                    {message}
+                </Alert>
+            </Snackbar>
         </div>
     )
 }

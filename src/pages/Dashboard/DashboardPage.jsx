@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react'
 import Navbar from '../../components/Navbar';
 import axios from 'axios'
-import {} from '@mui/material';
+import {CircularProgress, Box, Snackbar, Alert} from '@mui/material';
 import DepartmentList from './components/DepartmentList';
 import CoursesCards from './components/CoursesCards';
 import FilesList from './components/FilesList';
@@ -15,14 +15,12 @@ function DashboardPage ({onLogout}) {
     const [courses, setCourses] = useState([])
     const [loading, setLoading] = useState(false)
     const [selectedDepartment, setSelectedDepartment] = useState(null)
-    const [selectedCourse, setSelectedCourse] = useState(null)
-    const [typeFile, setTypeFile] = useState(null)
     const [files, setFiles] = useState([])
     const [showFiles, setShowFiles] = useState(false)
 
     const [message, setMessage] = useState('')
     const [severity, setSeverity] = useState('')
-    const [popUp, setPopup] = useState(false)
+    const [popup, setPopup] = useState(false)
 
     useEffect(()=>{
         const getAdmin = async ()=>{
@@ -91,6 +89,10 @@ function DashboardPage ({onLogout}) {
         }
     }
 
+    const handlePopup = () =>{
+        setPopup(false)
+    }
+
     return(
         <div>
             <Navbar isAdmin={isAdmin} onLogout={onLogout} style={{height: '10vh'}}/>
@@ -99,14 +101,22 @@ function DashboardPage ({onLogout}) {
                     <DepartmentList departments={departments} handleChangeDepartment={handleChangeDepartment}/>
                 </div>
                 
-                {showFiles ? 
+                { loading ? 
+                    <Box display="flex" justifyContent="center" alignItems="center" height="80vh" marginTop="15px">
+                        <CircularProgress size={60} />
+                    </Box> : showFiles ? 
                     (
-                        < FilesList files={files}/>
-                    ) : (
-                        <CoursesCards courses={courses} handleCardClick={handleCardClick} selectedDepartment={selectedDepartment}/>
+                            < FilesList files={files}/>
+                        ) : (
+                            <CoursesCards courses={courses} handleCardClick={handleCardClick} selectedDepartment={selectedDepartment}/>
                     )
                 }
             </div>
+            <Snackbar open={popup} autoHideDuration = {6000} onClose={handlePopup}>
+                <Alert onClose={handlePopup} severity={severity} >
+                    {message}
+                </Alert>
+            </Snackbar>
         </div>
     );
 };
